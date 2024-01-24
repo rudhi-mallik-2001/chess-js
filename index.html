@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --black-tile: #000;
+            --white-tile: #fff;
+            --tile-size: 80px;
+            --bg-color: #0000FF;
+            --clicked-color: #ADD8E6;
+        }
+
+        @media all and (max-width: 450px) {
+            :root {
+                --tile-size: 50px;
+            }
+        }
+
+        @media all and (max-width: 376px) {
+            :root {
+                --tile-size: 35px;
+            }
+        }
+
+
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .board {
+            display: grid;
+            position: relative;
+            grid-template-columns: calc(.25*var(--tile-size)) calc(8*var(--tile-size));
+        }
+
+        .tiles {
+            display: grid;
+            grid-template-columns: repeat(8, var(--tile-size));
+            grid-template-rows: repeat(8, var(--tile-size));
+            width: calc(8*var(--tile-size));
+        }
+
+        .--black-tile {
+            background-color: var(--black-tile);
+        }
+
+        .--white-tile {
+            background-color: var(--white-tile);
+        }
+
+        .light-blue {
+            background-color: lightblue;
+        }
+
+        .dark-blue {
+            background-color: darkblue;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="board">
+        <div class="tiles" id="chessboard">
+
+        </div>
+        <!-- Chessboard squares will be dynamically generated here -->
+    </div>
+
+    <script>
+        const chessboard = document.getElementById('chessboard');
+
+        function createChessboard() {
+            for (let row = 0; row < 8; row++) {
+                for (let col = 0; col < 8; col++) {
+                    const square = document.createElement('div');
+                    const className = getClass(col, row)
+                    square.classList.add(`${className}`);
+
+                    // Add event listeners for hover effect
+                    square.addEventListener('mouseenter', () => handleHover(square, col, row));
+                    square.addEventListener('mouseleave', () => handleLeave(square, col, row));
+
+                    chessboard.appendChild(square);
+                }
+            }
+        }
+        const getClass = (col, row) => {
+            return (col + row) % 2 == 0 ? '--black-tile' : '--white-tile'
+        }
+        function handleHover(square, col, row) {
+            square.classList.add('light-blue');
+
+            // Calculate squares attacked by a bishop
+            for (let i = 1; i < 8; i++) {
+                highlightSquare(col + i, row + i); // Bottom right diagonal
+                highlightSquare(col + i, row - i); // Top right diagonal
+                highlightSquare(col - i, row + i); // Bottom left diagonal
+                highlightSquare(col - i, row - i); // Top left diagonal
+            }
+        }
+
+        function handleLeave(square, col, row) {
+            square.classList.remove('light-blue');
+            for (let i = 1; i < 8; i++) {
+                removehighlightSquare(col + i, row + i); // Bottom right diagonal
+                removehighlightSquare(col + i, row - i); // Top right diagonal
+                removehighlightSquare(col - i, row + i); // Bottom left diagonal
+                removehighlightSquare(col - i, row - i); // Top left diagonal
+            }
+        }
+
+        function highlightSquare(col, row) {
+            const square = getSquare(col, row);
+            if (square) {
+                square.classList.add('dark-blue');
+            }
+        }
+        function removehighlightSquare(col, row) {
+            const square = getSquare(col, row);
+            if (square) {
+                square.classList.remove('dark-blue');
+            }
+        }
+
+        function getSquare(col, row) {
+            if (col >= 0 && col < 8 && row >= 0 && row < 8) {
+                const index = row * 8 + col;
+                return chessboard.children[index];
+            }
+            return null;
+        }
+
+        createChessboard();
+    </script>
+
+</body>
+
+</html>
